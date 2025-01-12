@@ -2,7 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 import os
-import re
+from urllib.parse import urljoin
+base_url = 'https://books.toscrape.com/'
 url = 'https://books.toscrape.com/catalogue/do-androids-dream-of-electric-sheep-blade-runner-1_149/index.html'
 
 headers = {
@@ -91,6 +92,11 @@ def review_rating():
     number = rating.get('class')
     print (number[1])
         
+def image():
+    url_class = soup.find('img')
+    url_relative = url_class.get('src')
+    url_complet = urljoin(base_url, url_relative)
+    print (url_complet)
     
 
 #upc()
@@ -100,4 +106,5 @@ def review_rating():
 #availability()
 #description()
 #category()
-review_rating()
+#review_rating()
+image()
