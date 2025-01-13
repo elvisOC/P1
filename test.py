@@ -5,7 +5,7 @@ import os
 from urllib.parse import urljoin
 
 
-url_base = 'https://books.toscrape.com/catalogue/category/books/fantasy_19/'
+url_base = 'https://books.toscrape.com/catalogue/category/books_1/index.html'
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
 }
@@ -76,9 +76,8 @@ def csv_file(data):
         writer = csv.writer(file)
         writer.writerow(data)
         
-
 def url_book(url_base, headers):
-    number_page = 0
+    number_page = 1
     directory = os.path.expandvars(r'C:\Users\%username%\Desktop\Openclassrooms\P1')
     os.makedirs(directory, exist_ok=True)
     file_path = os.path.join(directory, 'book_data.csv')
@@ -88,9 +87,7 @@ def url_book(url_base, headers):
         'number_available', 'product_description', 'category', 'review_rating','image_url']
         writer.writerow(field)
     while True: 
-        number_page += 1
-        url = f"{url_base}page-{number_page}.html"
-        page = requests.get(url, headers=headers)
+        page = requests.get(url_base, headers=headers)
         soup = BeautifulSoup(page.text, 'html.parser')
 
         if page.status_code != 200:
@@ -102,7 +99,7 @@ def url_book(url_base, headers):
         for i in p:
             path_book = i.find_next('a')
             url_relative = path_book.get('href')
-            url_book = urljoin(url, url_relative)
+            url_book = urljoin(url_base, url_relative)
             page = requests.get(url_book, headers=headers)
             if page.status_code == 200:
                 soup = BeautifulSoup(page.text, 'html.parser')
@@ -117,7 +114,22 @@ def url_book(url_base, headers):
                 review_rating(soup),
                 image(soup)]
                 csv_file(data)
-
+                number_page += 1
                 
-url_book(url_base, headers)
-
+                
+def page_category():
+    url_base = 'https://books.toscrape.com/catalogue/category/books_1/index.html'
+    page = requests.get(url_base, headers=headers)
+    soup = BeautifulSoup(page.text, 'html.parser')
+    url_category = soup.find('ul', class_='nav nav-list').find_all('a')
+    for i in url_category:
+        category_url = i.get('href')
+        #category_name = i.get_text()
+        url_complet = urljoin(url_base, category_url)
+        print (url_complet)
+        url_book(url_complet, headers)
+            
+            
+#url_book(url_base, headers)
+page_category()
+#        url = f"{url_base}page-{number_page}.html"
