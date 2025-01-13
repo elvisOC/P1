@@ -74,18 +74,20 @@ title_book = title()
 price_incl_tax = price_including_tax()
 price_excl_tax = price_excluding_tax()
 number_availab = availability()
-des = description()
+descrip = description()
 cat = category()
 rating = review_rating()
 url_image = image()
 
 def csv_file():
-    file = (r'C:\Users\%username%\Desktop\Openclassrooms\P1', 'w')
-    writer = csv.writer(file)
-    field = (['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax', 'price_excludind_tax', 
-    'number_available', 'product_description', 'category', 'review_rating','image_url'])
-    writer.writerow(field)
-    writer.writerow([url, universal_product_code, title_book, price_incl_tax, price_excl_tax, number_availab, des, cat, rating, url_image])
-    file.close()
+    directory = os.path.expandvars(r'C:\Users\%username%\Desktop\Openclassrooms\P1')
+    os.makedirs(directory, exist_ok=True)
+    file_path = os.path.join(directory, 'book_data.csv')
+    with open (file_path, 'w', newline ='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        field = ['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax', 'price_excludind_tax', 
+        'number_available', 'product_description', 'category', 'review_rating','image_url']
+        writer.writerow(field)
+        writer.writerow([url, universal_product_code, title_book, price_incl_tax, price_excl_tax, number_availab, descrip, cat, rating, url_image])
     
 csv_file()
