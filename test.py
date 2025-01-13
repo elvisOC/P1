@@ -10,28 +10,8 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
 }
 
-# retrieving the target web page
 page = requests.get(url, headers=headers)
-
-soup = BeautifulSoup(page.text, 'html.parser')
-
-#th_elements = soup.find_all('th')
-#print (th_elements)
-
-#td_elements = soup.find_all('td')
-#print (td_elements)
-
-
-
-#for tag in tr_elements:
- #   print(tag.get_text())
- 
-#title = soup.find('h1')
-#print(title.get_text())
-#csv_file = open(csv_path, 'w', encoding='utf-8', newline='')
-#writer = csv.writer(csv_file)
-#writer.writerow(['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax', 'price_excludind_tax', 'number_available', 'product_description', 'category', 'review_rating','image_url'])
-    
+soup = BeautifulSoup(page.text, 'html.parser') 
 th = soup.find_all('th')
 
 def upc():
@@ -39,72 +19,73 @@ def upc():
         if 'UPC' in i.get_text():
             td = i.find_next('td')
             if td:
-                print(td.get_text())
+                return td.get_text()
             
 def title():
     title = soup.find('h1')
-    print (title.get_text())
+    return title.get_text()
 
 def price_including_tax():
     for i in th:
          if 'Price (incl. tax)' in i.get_text():
             td = i.find_next('td')
             if td:
-                print(td.get_text())
+                return td.get_text()
                 
 def price_excluding_tax():
     for i in th:
          if 'Price (excl. tax)' in i.get_text():
             td = i.find_next('td')
             if td:
-                print(td.get_text())
+                return td.get_text()
         
 def availability():
     for i in th:
          if 'Availability' in i.get_text():
             td = i.find_next('td')
             if td:
-                print(td.get_text())
+                return td.get_text()
                 
-
-
-product_description = soup.find(id='product_description')
 def description():
-    for i in product_description:
-        p = i.find_next('p')
-        if p:
-            print(p.get_text())
+    product_description = soup.find(id='product_description')
+    p = product_description.find_next('p')
+    return p.get_text()
             
-
-#breadcrumb = soup.find_all(class_='breadcrumb')
-#category = breadcrumb.find_all('a')
-breadcrumb = soup.find('ul', class_='breadcrumb').find_all('a')
-#print (breadcrumb)
-
 def category():
+    breadcrumb = soup.find('ul', class_='breadcrumb').find_all('a')
     cat = breadcrumb[2]
-    print (cat.get_text())
-
+    return cat.get_text()
 
 def review_rating():
     star_rating = soup.find('div', class_='col-sm-6 product_main').find_all('p')
     rating = star_rating[2]
     number = rating.get('class')
-    print (number[1])
+    return number[1]
         
 def image():
     url_class = soup.find('img')
     url_relative = url_class.get('src')
     url_complet = urljoin(base_url, url_relative)
-    print (url_complet)
+    return url_complet
     
 
-#upc()
-#title()
-#price_including_tax()
-#price_excluding_tax()
-#availability()
-#description()
-#category()
-#review_rating()
-image()
+universal_product_code = upc()
+title_book = title()
+price_incl_tax = price_including_tax()
+price_excl_tax = price_excluding_tax()
+number_availab = availability()
+des = description()
+cat = category()
+rating = review_rating()
+url_image = image()
+
+def csv_file():
+    file = (r'C:\Users\%username%\Desktop\Openclassrooms\P1', 'w')
+    writer = csv.writer(file)
+    field = (['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax', 'price_excludind_tax', 
+    'number_available', 'product_description', 'category', 'review_rating','image_url'])
+    writer.writerow(field)
+    writer.writerow([url, universal_product_code, title_book, price_incl_tax, price_excl_tax, number_availab, des, cat, rating, url_image])
+    file.close()
+    
+csv_file()
