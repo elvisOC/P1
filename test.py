@@ -74,15 +74,19 @@ def csv_file(data):
     file_path = os.path.join(directory, 'book_data.csv')
     with open (file_path, 'a', newline ='', encoding='utf-8') as file:
         writer = csv.writer(file)
-        
-        field = ['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax', 'price_excludind_tax', 
-        'number_available', 'product_description', 'category', 'review_rating','image_url']
-        writer.writerow(field)
         writer.writerow(data)
         
 
 def url_book(url_base, headers):
     number_page = 0
+    directory = os.path.expandvars(r'C:\Users\%username%\Desktop\Openclassrooms\P1')
+    os.makedirs(directory, exist_ok=True)
+    file_path = os.path.join(directory, 'book_data.csv')
+    with open (file_path, 'a', newline ='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        field = ['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax', 'price_excludind_tax', 
+        'number_available', 'product_description', 'category', 'review_rating','image_url']
+        writer.writerow(field)
     while True: 
         number_page += 1
         url = f"{url_base}page-{number_page}.html"
