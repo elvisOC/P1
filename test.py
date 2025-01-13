@@ -77,15 +77,6 @@ def csv_file(data):
         writer.writerow(data)
         
 def url_book(url_base, headers):
-    number_page = 1
-    directory = os.path.expandvars(r'C:\Users\%username%\Desktop\Openclassrooms\P1')
-    os.makedirs(directory, exist_ok=True)
-    file_path = os.path.join(directory, 'book_data.csv')
-    with open (file_path, 'a', newline ='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        field = ['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax', 'price_excludind_tax', 
-        'number_available', 'product_description', 'category', 'review_rating','image_url']
-        writer.writerow(field)
     while True: 
         page = requests.get(url_base, headers=headers)
         soup = BeautifulSoup(page.text, 'html.parser')
@@ -118,18 +109,25 @@ def url_book(url_base, headers):
                 
                 
 def page_category():
-    url_base = 'https://books.toscrape.com/catalogue/category/books_1/index.html'
+    directory = os.path.expandvars(r'C:\Users\%username%\Desktop\Openclassrooms\P1')
+    os.makedirs(directory, exist_ok=True)
+    file_path = os.path.join(directory, 'book_data.csv')
+    with open (file_path, 'a', newline ='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        field = ['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax', 'price_excludind_tax', 
+        'number_available', 'product_description', 'category', 'review_rating','image_url']
+        writer.writerow(field)
+    url_base = 'https://books.toscrape.com/index.html'
+    url_partiel ='https://books.toscrape.com/'
     page = requests.get(url_base, headers=headers)
     soup = BeautifulSoup(page.text, 'html.parser')
-    url_category = soup.find('ul', class_='nav nav-list').find_all('a')
-    for i in url_category:
-        category_url = i.get('href')
-        #category_name = i.get_text()
-        url_complet = urljoin(url_base, category_url)
+    nav_list = soup.find('ul', class_='nav nav-list').find_next('ul')
+    url_category = nav_list.find_all('a')
+    for c in url_category:
+        cat = c.get('href')     
+        url_complet = urljoin(url_partiel, cat)
         print (url_complet)
         url_book(url_complet, headers)
-            
-            
-#url_book(url_base, headers)
+        
 page_category()
 #        url = f"{url_base}page-{number_page}.html"

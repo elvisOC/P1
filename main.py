@@ -17,3 +17,10 @@ for i in tr:
             value = td.get_text()
             print (value)
 
+    for i in cat:
+        category_url = i.get('href')
+        print(category_url)
+        #category_name = i.get_text()
+        url_complet = urljoin(url_base, category_url)
+        print (url_complet)
+        url_book(url_complet, headers)
