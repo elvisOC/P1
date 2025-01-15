@@ -4,8 +4,8 @@ import csv
 import os
 from urllib.parse import urljoin
 
-
-url_base = 'https://books.toscrape.com/catalogue/category/books_1/index.html'
+url_base = 'https://books.toscrape.com/index.html'
+url_partiel ='https://books.toscrape.com/'
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
 }
@@ -76,21 +76,22 @@ def csv_file(data):
         writer = csv.writer(file)
         writer.writerow(data)
         
-def url_book(url_base, headers):
+def info_book(category_url, headers):
+    page_number = 1
     while True: 
-        page = requests.get(url_base, headers=headers)
+        page_url = f"{category_url}/page-{page_number}.html" if page_number > 1 else category_url
+        page = requests.get(page_url, headers=headers)
         soup = BeautifulSoup(page.text, 'html.parser')
 
         if page.status_code != 200:
-            print(f"Page {number_page} not found. Exiting.")
             break
         
-        p = soup.find('ol', class_='row').find_all('h3')        
+        soup = BeautifulSoup(page.text, 'html.parser')
+        books = soup.find('ol', class_='row').find_all('h3')        
         
-        for i in p:
-            path_book = i.find_next('a')
-            url_relative = path_book.get('href')
-            url_book = urljoin(url_base, url_relative)
+        for book in books:
+            relative_url = book.find('a')['href']
+            url_book = urljoin(category_url, relative_url)
             page = requests.get(url_book, headers=headers)
             if page.status_code == 200:
                 soup = BeautifulSoup(page.text, 'html.parser')
@@ -105,29 +106,38 @@ def url_book(url_base, headers):
                 review_rating(soup),
                 image(soup)]
                 csv_file(data)
-                number_page += 1
+        page_number += 1            
                 
-                
-def page_category():
+def scrape_category(url_base, url_partiel, headers):
+    #Création du fichier csv 
     directory = os.path.expandvars(r'C:\Users\%username%\Desktop\Openclassrooms\P1')
     os.makedirs(directory, exist_ok=True)
     file_path = os.path.join(directory, 'book_data.csv')
+    
+    #Création de l'en-tête
     with open (file_path, 'a', newline ='', encoding='utf-8') as file:
         writer = csv.writer(file)
         field = ['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax', 'price_excludind_tax', 
         'number_available', 'product_description', 'category', 'review_rating','image_url']
         writer.writerow(field)
-    url_base = 'https://books.toscrape.com/index.html'
-    url_partiel ='https://books.toscrape.com/'
+        
+    #Parse la page d'acceuil du site   
     page = requests.get(url_base, headers=headers)
     soup = BeautifulSoup(page.text, 'html.parser')
-    nav_list = soup.find('ul', class_='nav nav-list').find_next('ul')
+    
+    #Cherche les catégories et leurs liens partiels
+    nav_list = soup.find('ul', class_='nav nav-list').find('ul')
     url_category = nav_list.find_all('a')
-    for c in url_category:
-        cat = c.get('href')     
-        url_complet = urljoin(url_partiel, cat)
-        print (url_complet)
-        url_book(url_complet, headers)
+    
+    #Pour chaque lien partiel, le rendre complet
+    if nav_list:
+        for category in url_category:
+            cat = category.get('href')     
+            category_url = urljoin(url_partiel, cat)
+            #print (category_url)
+            nom_categorie = category.get_text(strip=True)
+            print (nom_categorie)
+            #info_book(category_url, headers)
+
         
-page_category()
-#        url = f"{url_base}page-{number_page}.html"
+scrape_category(url_base, url_partiel, headers)
