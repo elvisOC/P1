@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import csv
 import os
 from urllib.parse import urljoin
-
+import urllib.request
 url_base = 'https://books.toscrape.com/index.html'
 url_partiel ='https://books.toscrape.com/'
 headers = {
@@ -68,17 +68,27 @@ def image(soup):
     url_complet = urljoin(url_base, url_relative)
     return url_complet
 
-def csv_file(data, nom_categorie):
-    directory = os.path.expandvars(r'C:\Users\%username%\Desktop\Openclassrooms\P1')
+def csv_file(data, nom_categorie, directory_name):
+    directory = os.path.expandvars(fr'C:\Users\%username%\Desktop\bookdata\{directory_name}')
     os.makedirs(directory, exist_ok=True)
     file_path = os.path.join(directory, nom_categorie + '.csv')
     with open (file_path, 'a', newline ='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(data)
         
-def info_book(category_url, headers, file_name):
+        
+def download_img(img_url, book_name, directory_name):
+    response = requests.get(img_url)
+    directory = os.path.expandvars(fr'C:\Users\%username%\Desktop\bookdata\{directory_name}\images')
+    os.makedirs(directory, exist_ok=True)
+    img_path = os.path.join(directory, book_name + '.jpg')
+    with open (img_path,'wb') as file:
+        file.write(response.content)
+        
+        
+def info_book(category_url, headers, file_name, directory_name):
         #Création du fichier csv 
-    directory = os.path.expandvars(r'C:\Users\%username%\Desktop\Openclassrooms\P1')
+    directory = os.path.expandvars(fr'C:\Users\%username%\Desktop\bookdata\{directory_name}')
     os.makedirs(directory, exist_ok=True)
     file_path = os.path.join(directory, file_name + '.csv')
     
@@ -92,7 +102,6 @@ def info_book(category_url, headers, file_name):
     while True: 
         page_url = f"{category_url}/page-{page_number}.html" if page_number > 1 else category_url
         page = requests.get(page_url, headers=headers)
-        soup = BeautifulSoup(page.text, 'html.parser')
 
         if page.status_code != 200:
             break
@@ -116,9 +125,12 @@ def info_book(category_url, headers, file_name):
                 category(soup),
                 review_rating(soup),
                 image(soup)]
-                csv_file(data, category(soup))
+                csv_file(data, category(soup), category(soup))
+                download_img(image(soup), title(soup), category(soup))
         page_number += 1            
                 
+                
+
 def scrape_category(url_base, url_partiel, headers):      
     #Parse la page d'acceuil du site   
     page = requests.get(url_base, headers=headers)
@@ -136,7 +148,7 @@ def scrape_category(url_base, url_partiel, headers):
             #print (category_url)
             nom_categorie = category.get_text(strip=True)
             print (nom_categorie)
-            info_book(category_url, headers, nom_categorie)
+            info_book(category_url, headers, nom_categorie, nom_categorie)
 
         
 scrape_category(url_base, url_partiel, headers)
