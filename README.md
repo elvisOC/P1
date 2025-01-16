@@ -10,7 +10,8 @@ Il télécharge également l'image du livre.
 Les informations sont écrites dans un fichier csv enregistré sur le bureau avec ce chemin : 'C:\\users\\%username%\\Desktop\\bookdata\\categorie\\categorie.csv'  
 Les images sont téléchargés dans un dossier avec ce chemin : 'C:\\users\\%username%\\Desktop\\bookdata\\categorie\\images\titredulivre.jpg'
 
-### Requierement  
+### Requirement 
+[Liste des paquets python](https://github.com/elvisOC/P1/blob/master/requirement.txt)
 
 ### Comment l'utiliser  
 
