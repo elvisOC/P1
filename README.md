@@ -11,10 +11,10 @@ Les informations sont écrites dans un fichier csv enregistré sur le bureau ave
 Les images sont téléchargés dans un dossier avec ce chemin : 'C:\\users\\%username%\\Desktop\\bookdata\\categorie\\images\titredulivre.jpg'
 
 ### Requirement  
-[Git](https://git-scm.com)
-[Python](www.python.org)
-[Liste des paquets python](https://github.com/elvisOC/P1/blob/master/requirement.txt)
-Pour installer les paquets, lancer python et écrire la commande pip install *nom du paquet*
+[Git](https://git-scm.com)  
+[Python](www.python.org)  
+[Liste des paquets python](https://github.com/elvisOC/P1/blob/master/requirement.txt)  
+Pour installer les paquets, lancer python et écrire la commande pip install *nom du paquet*  
 ![Sans titre](https://github.com/user-attachments/assets/de2eed6e-9b47-44af-9e81-82cba95c75a7)
 
 ### Comment l'utiliser  
