@@ -75,17 +75,15 @@ def csv_file(data, nom_categorie, directory_name):
     with open (file_path, 'a', newline ='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(data)
-        
-        
+   
 def download_img(img_url, book_name, directory_name):
     response = requests.get(img_url)
     directory = os.path.expandvars(fr'C:\Users\%username%\Desktop\bookdata\{directory_name}\images')
     os.makedirs(directory, exist_ok=True)
-    img_path = os.path.join(directory, book_name + '.jpg')
+    img_path = os.path.join(directory, f'{book_name}.jpg')
     with open (img_path,'wb') as file:
         file.write(response.content)
-        
-        
+
 def info_book(category_url, headers, file_name, directory_name):
         #Création du fichier csv 
     directory = os.path.expandvars(fr'C:\Users\%username%\Desktop\bookdata\{directory_name}')
@@ -128,8 +126,6 @@ def info_book(category_url, headers, file_name, directory_name):
                 csv_file(data, category(soup), category(soup))
                 download_img(image(soup), title(soup), category(soup))
         page_number += 1            
-                
-                
 
 def scrape_category(url_base, url_partiel, headers):      
     #Parse la page d'acceuil du site   
