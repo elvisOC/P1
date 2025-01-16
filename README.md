@@ -20,7 +20,7 @@ Pour installer les paquets, lancer python et écrire la commande pip install *no
 ### Comment l'utiliser  
 
 #### Télécharger le script
-Avec git executer la commande git clone *lien du dépôt* dans un nouveau dossier (il faut l'indiquer dans la commande)
+Avec git executer la commande git clone *lien du dépôt* dans un nouveau dossier (il faut l'indiquer dans la commande)  
 ![Capture d’écran 2025-01-16 103946](https://github.com/user-attachments/assets/76592f5d-3f1e-4c6e-b953-c9c4a7f86fba)  
 
 #### Executer le script
