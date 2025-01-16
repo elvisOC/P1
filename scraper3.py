@@ -11,6 +11,7 @@ headers = {
 }
 
 def upc(soup):
+    #Récupère l'UPC d'un livre
     th = soup.find_all('th')
     for i in th:
         if 'UPC' in i.get_text():
@@ -19,10 +20,12 @@ def upc(soup):
                 return td.get_text()
             
 def title(soup):
+    #Récupère le titre du livre
     title = soup.find('h1')
     return title.get_text()
 
 def price_including_tax(soup):
+    #Récupère le prix taxe incluse
     th = soup.find_all('th')
     for i in th:
          if 'Price (incl. tax)' in i.get_text():
@@ -31,6 +34,7 @@ def price_including_tax(soup):
                 return td.get_text()
                 
 def price_excluding_tax(soup):
+    #Récupère le prix hors taxes
     th = soup.find_all('th')
     for i in th:
          if 'Price (excl. tax)' in i.get_text():
@@ -39,6 +43,7 @@ def price_excluding_tax(soup):
                 return td.get_text()
         
 def availability(soup):
+    #Récupère le nombre d'unités disponibles
     th = soup.find_all('th')
     for i in th:
          if 'Availability' in i.get_text():
@@ -47,28 +52,33 @@ def availability(soup):
                 return td.get_text()
                 
 def description(soup):
+    #Récupère la description du livre
     product_description = soup.find(id='product_description')
     p = product_description.find_next('p')
     return p.get_text()
             
 def category(soup):
+    #Récupère la categorie du livre
     breadcrumb = soup.find('ul', class_='breadcrumb').find_all('a')
     cat = breadcrumb[2]
     return cat.get_text()
 
 def review_rating(soup):
+    #Récupère le nombre d'étoiles (sur 5)
     star_rating = soup.find('div', class_='col-sm-6 product_main').find_all('p')
     rating = star_rating[2]
     number = rating.get('class')
     return number[1]
         
 def image(soup):
+    #Récupère l'url de l'image du livre
     url_class = soup.find('img')
     url_relative = url_class.get('src')
     url_complet = urljoin(url_base, url_relative)
     return url_complet
 
 def csv_file(data, nom_categorie, directory_name):
+    #Crée un fichier csv 
     directory = os.path.expandvars(fr'C:\Users\%username%\Desktop\bookdata\{directory_name}')
     os.makedirs(directory, exist_ok=True)
     file_path = os.path.join(directory, nom_categorie + '.csv')
@@ -77,6 +87,7 @@ def csv_file(data, nom_categorie, directory_name):
         writer.writerow(data)
    
 def download_img(img_url, book_name, directory_name):
+    #Télécharge l'image du livre à partir de son url
     response = requests.get(img_url)
     directory = os.path.expandvars(fr'C:\Users\%username%\Desktop\bookdata\{directory_name}\images')
     os.makedirs(directory, exist_ok=True)
@@ -85,7 +96,7 @@ def download_img(img_url, book_name, directory_name):
         file.write(response.content)
 
 def info_book(category_url, headers, file_name, directory_name):
-        #Création du fichier csv 
+    #Création du fichier csv 
     directory = os.path.expandvars(fr'C:\Users\%username%\Desktop\bookdata\{directory_name}')
     os.makedirs(directory, exist_ok=True)
     file_path = os.path.join(directory, file_name + '.csv')
@@ -97,6 +108,7 @@ def info_book(category_url, headers, file_name, directory_name):
         'number_available', 'product_description', 'category', 'review_rating','image_url']
         writer.writerow(field)
     page_number = 1
+    #Condition page existante pour parcourir les différentes pages d'une catégorie
     while True: 
         page_url = f"{category_url}/page-{page_number}.html" if page_number > 1 else category_url
         page = requests.get(page_url, headers=headers)
@@ -106,7 +118,7 @@ def info_book(category_url, headers, file_name, directory_name):
         
         soup = BeautifulSoup(page.text, 'html.parser')
         books = soup.find('ol', class_='row').find_all('h3')        
-        
+        #Boucle permettant de lancer les différentes fonctions des infos de livre à partir de tout les liens récupérés par le scrape des catégories
         for book in books:
             relative_url = book.find('a')['href']
             url_book = urljoin(category_url, relative_url)
@@ -146,5 +158,4 @@ def scrape_category(url_base, url_partiel, headers):
             print (nom_categorie)
             info_book(category_url, headers, nom_categorie, nom_categorie)
 
-        
 scrape_category(url_base, url_partiel, headers)
