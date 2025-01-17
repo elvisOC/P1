@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import csv
 import os
 from urllib.parse import urljoin
-import urllib.request
+import re
 url_base = 'https://books.toscrape.com/index.html'
 url_partiel ='https://books.toscrape.com/'
 headers = {
@@ -21,8 +21,10 @@ def upc(soup):
             
 def title(soup):
     #Récupère le titre du livre
-    title = soup.find('h1')
-    return title.get_text()
+    soup_title = soup.find('h1')
+    raw_title = soup_title.get_text()
+    title = re.sub(r'[* " / \\< > : | ?]', '', raw_title)
+    return title
 
 def price_including_tax(soup):
     #Récupère le prix taxe incluse
@@ -54,9 +56,12 @@ def availability(soup):
 def description(soup):
     #Récupère la description du livre
     product_description = soup.find(id='product_description')
-    p = product_description.find_next('p')
-    return p.get_text()
-            
+    if product_description:
+        p = product_description.find_next('p')
+        return p.get_text()
+    else:
+        p = 'Aucune description'
+        
 def category(soup):
     #Récupère la categorie du livre
     breadcrumb = soup.find('ul', class_='breadcrumb').find_all('a')
@@ -77,12 +82,22 @@ def image(soup):
     url_complet = urljoin(url_base, url_relative)
     return url_complet
 
-def csv_file(data, nom_categorie, directory_name):
+def csv_file_create(nom_categorie):
     #Crée un fichier csv 
-    directory = os.path.expandvars(fr'C:\Users\%username%\Desktop\bookdata\{directory_name}')
+    directory = os.path.expandvars(fr'C:\Users\%username%\Desktop\bookdata\{nom_categorie}')
     os.makedirs(directory, exist_ok=True)
     file_path = os.path.join(directory, nom_categorie + '.csv')
     with open (file_path, 'a', newline ='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        field = ['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax', 'price_excludind_tax', 
+        'number_available', 'product_description', 'category', 'review_rating','image_url']
+        writer.writerow(field)
+
+def csv_file_add(data, nom_categorie):
+    #Ajoute les données au fichier csv
+    directory = os.path.expandvars(fr'C:\Users\%username%\Desktop\bookdata\{nom_categorie}')
+    file_path = os.path.join(directory, nom_categorie + '.csv')
+    with open (file_path, 'a', newline = '', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(data)
    
@@ -95,24 +110,14 @@ def download_img(img_url, book_name, directory_name):
     with open (img_path,'wb') as file:
         file.write(response.content)
 
-def info_book(category_url, headers, file_name, directory_name):
-    #Création du fichier csv 
-    directory = os.path.expandvars(fr'C:\Users\%username%\Desktop\bookdata\{directory_name}')
-    os.makedirs(directory, exist_ok=True)
-    file_path = os.path.join(directory, file_name + '.csv')
-    
-    #Création de l'en-tête
-    with open (file_path, 'a', newline ='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        field = ['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax', 'price_excludind_tax', 
-        'number_available', 'product_description', 'category', 'review_rating','image_url']
-        writer.writerow(field)
+def info_book(category_url, headers, directory_name):
+    csv_file_create(directory_name)
     page_number = 1
     #Condition page existante pour parcourir les différentes pages d'une catégorie
     while True: 
         page_url = f"{category_url}/page-{page_number}.html" if page_number > 1 else category_url
         page = requests.get(page_url, headers=headers)
-
+        page.encoding = 'utf-8'
         if page.status_code != 200:
             break
         
@@ -123,6 +128,7 @@ def info_book(category_url, headers, file_name, directory_name):
             relative_url = book.find('a')['href']
             url_book = urljoin(category_url, relative_url)
             page = requests.get(url_book, headers=headers)
+            page.encoding = 'utf-8'
             if page.status_code == 200:
                 soup = BeautifulSoup(page.text, 'html.parser')
                 data = [url_book,
@@ -135,7 +141,7 @@ def info_book(category_url, headers, file_name, directory_name):
                 category(soup),
                 review_rating(soup),
                 image(soup)]
-                csv_file(data, category(soup), category(soup))
+                csv_file_add(data, category(soup))
                 download_img(image(soup), title(soup), category(soup))
         page_number += 1            
 
@@ -155,7 +161,6 @@ def scrape_category(url_base, url_partiel, headers):
             category_url = urljoin(url_partiel, cat)
             #print (category_url)
             nom_categorie = category.get_text(strip=True)
-            print (nom_categorie)
-            info_book(category_url, headers, nom_categorie, nom_categorie)
+            info_book(category_url, headers, nom_categorie)
 
 scrape_category(url_base, url_partiel, headers)
