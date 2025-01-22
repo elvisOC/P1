@@ -20,7 +20,7 @@ def upc(soup):
                 return td.get_text()
             
 def title(soup):
-    #Récupère le titre du livre
+    #Récupère le titre du livre et nettoie les caractères interdit dans le filename windows
     soup_title = soup.find('h1')
     raw_title = soup_title.get_text()
     title = re.sub(r'[* " / \\< > : | ?]', '', raw_title)
