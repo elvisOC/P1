@@ -30,6 +30,10 @@ git clone github.com/ElvisOC/P1.git C:\users\%username%\Desktop\Nouveau
  
 
 #### Executer le script
+Dans le dossier contenant le script :  
 
-Clique droit sur le script, ouvrir avec, python :  
-![Capture d’écran 2025-01-16 104124](https://github.com/user-attachments/assets/9224db2c-48a1-48a5-8352-ff0219c68c2b)
+```
+python main.py
+```
+
+
