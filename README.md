@@ -15,18 +15,18 @@ Les images sont téléchargés dans un dossier avec ce chemin : 'C:\\users\\%use
 [Python](www.python.org)  
 [Liste des paquets python](https://github.com/elvisOC/P1/blob/master/requirement.txt)  
 Pour installer les paquets, lancer python et écrire la commande pip install *nom du paquet*  
-'''
+```
 pip install beautifulsoup
-'''
+```
 ![Sans titre](https://github.com/user-attachments/assets/de2eed6e-9b47-44af-9e81-82cba95c75a7)
 
 ### Comment l'utiliser  
 
 #### Télécharger le script
 Avec git executer la commande git clone *lien du dépôt* dans un nouveau dossier (il faut l'indiquer dans la commande) 
-'''
+```
 git clone github.com/ElvisOC/P1.git C:\users\%username%\Desktop\Nouveau
-'''
+```
 ![Capture d’écran 2025-01-16 103946](https://github.com/user-attachments/assets/76592f5d-3f1e-4c6e-b953-c9c4a7f86fba)  
 
 #### Executer le script
