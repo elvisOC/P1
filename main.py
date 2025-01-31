@@ -10,6 +10,7 @@ url_partiel ='https://books.toscrape.com/'
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
 }
+
 path = pathlib.Path(__file__).parent.resolve()
 
 def parse_page(url):
@@ -34,7 +35,7 @@ def title(soup):
     #Récupère le titre du livre et nettoie les caractères interdit dans le filename windows
     soup_title = soup.find('h1')
     raw_title = soup_title.get_text()
-    title = re.sub(r'[* " / \\< > : | ?]', '', raw_title)
+    title = re.sub(r'[*"/\\<>:|?]', '', raw_title)
     return title
 
 def price_including_tax(soup):
@@ -94,16 +95,16 @@ def add_data_csv(data, nom_categorie):
         writer = csv.writer(file)
         writer.writerow(data)
 
-def download_img(img_url, book_name, directory_name):
+def download_img(img_url, book_name, nom_categorie, path):
     #Télécharge l'image du livre à partir de son url
     response = requests.get(img_url)
-    directory = os.path.expandvars(fr'C:\Users\%username%\Desktop\bookdata\{directory_name}\images')
+    directory = os.path.join(path, f"databook\\{nom_categorie}\\images")
     os.makedirs(directory, exist_ok=True)
     img_path = os.path.join(directory, f'{book_name}.jpg')
     with open (img_path,'wb') as file:
         file.write(response.content)
 
-def info_book(book_url, category):
+def info_book(book_url, category, path):
     soup = parse_page(book_url)
     if soup:
         data = [book_url,
@@ -117,7 +118,7 @@ def info_book(book_url, category):
                 review_rating(soup),
                 image(soup)]
         add_data_csv(data, category)
-        download_img(image(soup), title(soup), book_category(soup))
+        download_img(image(soup), title(soup), book_category(soup), path)
 
 def scrape_category(category_url, category, path):
     csv_file_create(category, path)
@@ -131,7 +132,7 @@ def scrape_category(category_url, category, path):
         for book in books:
             relative_url = book.find('a')['href']
             url_book = urljoin(category_url, relative_url)
-            info_book(url_book, category)
+            info_book(url_book, category, path)
             page_number += 1
                 
 def scrape_all_category(url_base, url_partiel, path):
