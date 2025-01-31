@@ -36,7 +36,7 @@ def title(soup):
     soup_title = soup.find('h1')
     raw_title = soup_title.get_text()
     title = re.sub(r'[*"/\\<>:|?]', '', raw_title)
-    return title
+    return title[0:138]
 
 def price_including_tax(soup):
     return extract_table_data(soup, 'Price (incl. tax)')
